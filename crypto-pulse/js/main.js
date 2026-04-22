@@ -1,85 +1,52 @@
-// Variables globales 
-let coins = [];
-let filteredCoins = [];
-let isLoading = false;
-let isError = false;
-
-const coins_container = document.getElementById('coins_container');
-const API_URL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd';
+import { fetchCoins } from "./api/coins.js";
+import { state } from "./state/appState.js";
+import { renderCoins } from "./ui/render.js";
 
 
+const searchInput = document.getElementById("search-input");
 
-// Comprobar conexión 
-console.log('CryptoPulse Conectado'); 
+function handleSearch(event) {
+  const query = event.target.value.toLowerCase();
 
+  state.filteredCoins = state.coins.filter((coin) =>
+    coin.name.toLowerCase().includes(query)
+  );
+  console.log("Jj");
+  renderCoins(state.filteredCoins);
+}
 
-async function loadCoins() {
-  isLoading = true;
-  isError = false; 
-  render();
-  try{
-    const response = await fetch(API_URL);
-  
-    if(!response.ok){
-      throw new Error("API failed");
-    }
+const debouncedSearch = debounce(handleSearch, 300);
 
-    const data = await response.json();
+function debounce(fn, delay) {
+  let timeoutId;
 
-    coins = data;
-    filteredCoins = data;
-    
+  return function (...args) {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
+async function init() {
+  try {
+    state.isLoading = true; 
+
+    const data = await fetchCoins();
+
+    state.coins = data;
+    state.filteredCoins = data;
+
+    renderCoins(state.filteredCoins);
+
+    state.isLoading = false;
   }catch(error){
+    state.isError = true;
     console.error(error);
-    isError = true;
-  } finally {
-    isLoading = false;
-    render();
   }
 }
 
-function renderLoading() {
-  return '<p>Cargando...</p>';
-}
+searchInput.addEventListener("input", debouncedSearch);
 
-function renderError() {
-  return '<p>Error al cargar los datos</p>';
-}
-
-function renderEmpty(){
-  return '<p>No hay resultados</p>';
-}
-
-function renderCoins() {
-  return coins.map(coin => 
-    ` <div>
-        <img src="${coin.image}" alt ="${coin.name}" width="50" />
-        <p>${coin.name}</p>
-        <p>${coin.current_price}</p>
-      </div>`).join("");
-
-}
-
-function render(){
-
-  if(isLoading){
-    coins_container.innerHTML = renderLoading();
-    return;
-  }
-  if(isError){
-    coins_container.innerHTML = renderError();
-    return;
-  }
-
-  if(coins.length === 0){
-    coins_container.innerHTML = renderEmpty();
-    return; 
-  }
-
-  coins_container.innerHTML = renderCoins();
-}
-
-loadCoins();
-
-
-
+init();
