@@ -5,13 +5,14 @@ export function renderCoins(coins) {
   const container = document.getElementById('coins_container');
   container.innerHTML = '';
 
+  const fragment = document.createDocumentFragment();
+
   coins.forEach((coin) => {
     const div = document.createElement("div");
     div.classList.add("coin-card");
 
     const isFav = state.favorites.includes(coin.id);
 
-    // 👉 proteger datos de la API
     const price = coin.current_price
       ? coin.current_price.toLocaleString()
       : "N/A";
@@ -23,11 +24,11 @@ export function renderCoins(coins) {
         : "N/A";
 
     const changeClass =
-    change === null || change === undefined
-      ? ""
-      : change >= 0
-      ? "positive"
-      : "negative";  
+      change === null || change === undefined
+        ? ""
+        : change >= 0
+        ? "positive"
+        : "negative";
 
     div.innerHTML = `
       <div class="coin-top">
@@ -40,7 +41,6 @@ export function renderCoins(coins) {
           ${isFav ? '★' : '☆'}
         </button>
       </div>
-    
 
       <div class="coin-bottom">
         <p class="price">$${price}</p>
@@ -50,7 +50,6 @@ export function renderCoins(coins) {
       </div>
     `;
 
-    // 👉 abrir gráfico (sin romper botón ⭐)
     div.addEventListener("click", (e) => {
       if (e.target.classList.contains("fav-btn")) return;
 
@@ -60,8 +59,10 @@ export function renderCoins(coins) {
       renderOpenCharts();
     });
 
-    container.appendChild(div);
+    fragment.appendChild(div);
   });
+
+  container.appendChild(fragment);
 }
 
 export async function renderOpenCharts() {

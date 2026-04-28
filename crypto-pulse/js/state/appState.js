@@ -4,6 +4,7 @@ export const state = {
   isLoading: false,
   isError: false,
   favorites: [],
-  openCharts: []
+  openCharts: [],
+  lastRenderedCoins: []
 };
 

@@ -4,15 +4,19 @@ import { renderCoins, renderLoading, renderError } from "./ui/render.js";
 
 const searchInput = document.getElementById("search-input");
 
-function handleSearch(event) {
-  const query = event.target.value.toLowerCase();
+function handleSearch(value) {
+  const query = value.toLowerCase();
 
   state.filteredCoins = state.coins.filter((coin) =>
     coin.name.toLowerCase().includes(query)
   );
-  console.log("Jj");
-  renderCoins(state.filteredCoins);
-  addFavoriteEvents();  
+
+  if (shouldRender(state.filteredCoins)) {
+    renderCoins(state.filteredCoins);
+    addFavoriteEvents();
+
+    state.lastRenderedCoins = [...state.filteredCoins];
+  }
 }
 
 const debouncedSearch = debounce(handleSearch, 300);
@@ -58,6 +62,16 @@ function addFavoriteEvents() {
   });
 }
 
+//Funcion de shouldRender
+
+function shouldRender(newCoins) {
+  if (state.lastRenderedCoins.length !== newCoins.length) return true;
+
+  return newCoins.some((coin, index) => {
+    return coin.id !== state.lastRenderedCoins[index]?.id;
+  });
+}
+
 async function init() {
   try {
     renderLoading(); //  primero UI
@@ -80,11 +94,12 @@ async function init() {
 
     state.isError = true;
 
-    renderError(); // 👈 usar esto, no renderCoins(data)
+    renderError(); // usar esto, no renderCoins(data)
   }
 }
 
-searchInput.addEventListener("input", debouncedSearch);
-
+searchInput.addEventListener("input", (e) => {
+  debouncedSearch(e.target.value);
+});
 
 init();
