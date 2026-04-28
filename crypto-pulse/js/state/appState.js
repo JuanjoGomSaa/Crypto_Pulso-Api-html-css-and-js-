@@ -3,6 +3,7 @@ export const state = {
   filteredCoins: [],
   isLoading: false,
   isError: false,
-  favorites: []
+  favorites: [],
+  openCharts: []
 };
 
