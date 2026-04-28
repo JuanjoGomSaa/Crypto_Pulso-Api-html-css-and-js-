@@ -2,8 +2,8 @@ import { fetchCoins } from "./api/coins.js";
 import { state } from "./state/appState.js";
 import { renderCoins, renderLoading, renderError } from "./ui/render.js";
 
-const searchInput = document.getElementById("search-input");
-
+const searchInput = document.getElementById("search_input");
+state.visibleCount = 10;
 function handleSearch(value) {
   const query = value.toLowerCase();
 

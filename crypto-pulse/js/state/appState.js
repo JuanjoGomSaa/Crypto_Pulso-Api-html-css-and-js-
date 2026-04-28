@@ -5,6 +5,7 @@ export const state = {
   isError: false,
   favorites: [],
   openCharts: [],
-  lastRenderedCoins: []
+  lastRenderedCoins: [],
+  visibleCount: 10,
 };
 

@@ -1,13 +1,22 @@
 import { state } from "../state/appState.js";
 import { getCoinHistory, renderChartInCanvas} from "../services/chatService.js";
 
+
+
 export function renderCoins(coins) {
   const container = document.getElementById('coins_container');
   container.innerHTML = '';
 
+  if (!coins || coins.length === 0) {
+  container.innerHTML = `
+    <p class="error">No se encontraron resultados</p>
+  `;
+  return;
+}
+
   const fragment = document.createDocumentFragment();
 
-  coins.forEach((coin) => {
+  coins.slice(0, state.visibleCount).forEach((coin) => {
     const div = document.createElement("div");
     div.classList.add("coin-card");
 
@@ -60,19 +69,26 @@ export function renderCoins(coins) {
     });
 
     fragment.appendChild(div);
+
   });
 
   container.appendChild(fragment);
+  renderLoadMoreButton(coins);
 }
 
 export async function renderOpenCharts() {
   const container = document.getElementById("charts_container");
 
-  // limpiar
   container.innerHTML = "";
 
-  for (const coinId of state.openCharts) {
+  const placeholder = document.querySelector(".placeholder");
+  if (placeholder) {
+    placeholder.style.display = state.openCharts.length === 0 ? "block" : "none";
+  }
+
+  const chartPromises = state.openCharts.map(async (coinId) => {
     const coin = state.coins.find(c => c.id === coinId);
+    if (!coin) return;
 
     const wrapper = document.createElement("div");
     wrapper.classList.add("chart-card");
@@ -87,12 +103,11 @@ export async function renderOpenCharts() {
 
     container.appendChild(wrapper);
 
-    //  traer data
     const prices = await getCoinHistory(coin.id);
-
-    //  render chart en ese canvas específico
     renderChartInCanvas(`chart-${coin.id}`, prices);
-  }
+  });
+
+  await Promise.all(chartPromises);
 
   attachCloseEvents();
 }
@@ -140,4 +155,30 @@ export function renderError() {
   container.innerHTML = `
     <p class="error">Error cargando datos. Intenta de nuevo.</p>
   `;
+}
+function renderLoadMoreButton(coins) {
+  const container = document.getElementById('coins_container');
+
+  const oldBtn = document.querySelector('.load-more-btn');
+  if (oldBtn) oldBtn.remove();
+
+  const btn = document.createElement("button");
+  btn.classList.add("load-more-btn");
+
+  const hasMore = state.visibleCount < coins.length;
+
+  btn.textContent = hasMore ? "Mostrar más" : "Mostrar menos";
+
+  btn.addEventListener("click", () => {
+    if (state.visibleCount >= coins.length) {
+      state.visibleCount = 10;
+    } else {
+      state.visibleCount += 10;
+    }
+
+    renderCoins(state.filteredCoins);
+    addFavoriteEvents();
+  });
+
+  container.appendChild(btn);
 }

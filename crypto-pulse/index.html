@@ -9,26 +9,27 @@
 <body>
   <header class="header">
     <h1>CryptoPulse</h1>
-    <input type="text" placeholder="Buscar criptomoneda..." name="" id="search-input" >
+    <input 
+      type="text" 
+      id="search_input" 
+      placeholder="Buscar criptomoneda..." 
+    >
   </header>
 
   <main class="container">
-    <!-- Lista de CRYPTOS -->
-    <section id="coins_container" class="coins-list">
-      <!-- Aquí van las monedas -->
-    </section>
     
-    <!-- Panel de detalle -->
-    <section class="coin-detail">
-      <p>Selecciona una moneda</p>    
-      <section id="charts_container" class="coin-detail"></section>
-    </section>
-
+    <!-- Lista -->
+    <section id="coins_container" class="coins-list"></section>
+    
+    <!-- Detalle -->
+    <aside class="coin-detail">
+      <p class="placeholder" id="placeholder">Selecciona una moneda</p>
+      <div id="charts_container"></div>
+    </aside>
 
   </main>
 
   <script type="module" src="./js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </body>
 </html>

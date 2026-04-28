@@ -46,28 +46,76 @@ body{
 /* MAIN LAYOUT */
 .container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-areas: 
+    "charts"
+    "coins";
   gap: 16px;
   padding: 16px;
+}
+
+.coins-list {
+  grid-area: coins;
+}
+
+.coin-detail {
+  grid-area: charts;
 }
 
 @media (min-width: 1024px) {
   .container {
     grid-template-columns: 1fr 2fr;
+    grid-template-areas: "coins charts";
   }
 }
 
 /* LISTA */
 .coins-list {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
 }
 
-@media (min-width: 768px) {
-  .coins-list {
-    grid-template-columns: repeat(2, 1fr);
+#charts_container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Close btn */
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #ef4444;
+  transform: scale(1.2);
+}
+
+/* Ajustes de mobile  */
+@media (max-width: 768px) {
+  .coin-card {
+    padding: 12px;
   }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+}
+
+.chart-card {
+  background: #020617;
+  padding: 12px;
+  border-radius: 12px;
 }
 
 /* DETALLE */
@@ -163,4 +211,98 @@ body{
   0% { opacity: 0.6; }
   50% { opacity: 1; }
   100% { opacity: 0.6; }
+}
+
+/* Mejora de la estrella */
+
+.fav-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #777; /* gris base */
+  transition: all 0.2s ease;
+}
+
+/* hover */
+.fav-btn:hover {
+  transform: scale(1.2);
+  color: #f1c40f;
+}
+
+/* cuando es favorita */
+.fav-btn:has(> *) {} /* ignora esto si no hay iconos*/
+
+/* solución real con tu lógica actual */
+.fav-btn {
+  color: #777;
+}
+
+.fav-btn:focus {
+  outline: none;
+}
+
+/*  estrella activa */
+.fav-btn.active {
+  color: #f1c40f;
+}
+
+/* Boton de mostrar mas */
+
+.load-more-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.load-more-btn:hover {
+  background: #2563eb;
+}
+
+/* Mobile retoques  */
+
+@media (max-width: 768px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .coin-detail {
+    order: 1;
+  }
+
+  .coins-list {
+    order: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-card {
+    padding: 10px;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .coin-card {
+    padding: 10px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .change {
+    font-size: 12px;
+  }
 }
