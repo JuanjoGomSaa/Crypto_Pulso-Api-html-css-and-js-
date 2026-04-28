@@ -3,30 +3,63 @@ import { getCoinHistory, renderChartInCanvas} from "../services/chatService.js";
 
 export function renderCoins(coins) {
   const container = document.getElementById('coins_container');
-  
   container.innerHTML = '';
 
-  coins.forEach((coin) =>{
+  coins.forEach((coin) => {
     const div = document.createElement("div");
-    const isFav = state.favorites.includes(coin.id);
-    div.innerHTML =
-    `
-      <p>${coin.name}</p>
-      <p>$${coin.current_price}</p>
-      <button data-id="${coin.id}" class="fav-btn">
-        ${isFav ? '★' : '☆'}
-      </button>
-    `;
-  
-   //Evento de graficas
-  div.addEventListener("click", () => {
-   // evitar duplicados
-    if (state.openCharts.includes(coin.id)) return;
+    div.classList.add("coin-card");
 
-   state.openCharts.push(coin.id);
-   renderOpenCharts();
-  });
+    const isFav = state.favorites.includes(coin.id);
+
+    // 👉 proteger datos de la API
+    const price = coin.current_price
+      ? coin.current_price.toLocaleString()
+      : "N/A";
+
+    const change = coin.price_change_percentage_24h;
+    const formattedChange =
+      change !== null && change !== undefined
+        ? change.toFixed(2) + "%"
+        : "N/A";
+
+    const changeClass =
+    change === null || change === undefined
+      ? ""
+      : change >= 0
+      ? "positive"
+      : "negative";  
+
+    div.innerHTML = `
+      <div class="coin-top">
+        <div>
+          <h3>${coin.name}</h3>
+          <span class="symbol">${coin.symbol.toUpperCase()}</span>
+        </div>
+
+        <button class="fav-btn" data-id="${coin.id}">
+          ${isFav ? '★' : '☆'}
+        </button>
+      </div>
     
+
+      <div class="coin-bottom">
+        <p class="price">$${price}</p>
+        <p class="change ${changeClass}">
+          ${formattedChange}
+        </p>
+      </div>
+    `;
+
+    // 👉 abrir gráfico (sin romper botón ⭐)
+    div.addEventListener("click", (e) => {
+      if (e.target.classList.contains("fav-btn")) return;
+
+      if (state.openCharts.includes(coin.id)) return;
+
+      state.openCharts.push(coin.id);
+      renderOpenCharts();
+    });
+
     container.appendChild(div);
   });
 }
@@ -53,10 +86,10 @@ export async function renderOpenCharts() {
 
     container.appendChild(wrapper);
 
-    // 🔥 traer data
+    //  traer data
     const prices = await getCoinHistory(coin.id);
 
-    // 🔥 render chart en ese canvas específico
+    //  render chart en ese canvas específico
     renderChartInCanvas(`chart-${coin.id}`, prices);
   }
 
@@ -78,3 +111,32 @@ function attachCloseEvents() {
   });
 }
 
+//Render loading
+
+export function renderLoading() {
+  const container = document.getElementById('coins_container');
+  container.innerHTML = '';
+
+  for (let i = 0; i < 6; i++) {
+    const div = document.createElement('div');
+    div.classList.add('coin-card', 'skeleton');
+
+    div.innerHTML = `
+      <div class="skeleton-line title"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+    `;
+
+    container.appendChild(div);
+  }
+}
+
+// Render error
+
+export function renderError() {
+  const container = document.getElementById('coins_container');
+
+  container.innerHTML = `
+    <p class="error">Error cargando datos. Intenta de nuevo.</p>
+  `;
+}

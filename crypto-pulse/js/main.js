@@ -1,7 +1,6 @@
 import { fetchCoins } from "./api/coins.js";
 import { state } from "./state/appState.js";
-import { renderCoins } from "./ui/render.js";
-
+import { renderCoins, renderLoading, renderError } from "./ui/render.js";
 
 const searchInput = document.getElementById("search-input");
 
@@ -61,9 +60,11 @@ function addFavoriteEvents() {
 
 async function init() {
   try {
-    loadFavorites();
+    renderLoading(); //  primero UI
 
-    state.isLoading = true; 
+    loadFavorites(); //  carga favoritos
+
+    state.isLoading = true;
 
     const data = await fetchCoins();
 
@@ -72,17 +73,18 @@ async function init() {
 
     renderCoins(state.filteredCoins);
     addFavoriteEvents();
-    
 
     state.isLoading = false;
-  }catch(error){
-    state.isError = true;
+  } catch (error) {
     console.error(error);
+
+    state.isError = true;
+
+    renderError(); // 👈 usar esto, no renderCoins(data)
   }
 }
 
-
-
 searchInput.addEventListener("input", debouncedSearch);
+
 
 init();
