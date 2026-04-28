@@ -13,6 +13,7 @@ function handleSearch(event) {
   );
   console.log("Jj");
   renderCoins(state.filteredCoins);
+  addFavoriteEvents();  
 }
 
 const debouncedSearch = debounce(handleSearch, 300);
@@ -29,8 +30,39 @@ function debounce(fn, delay) {
   };
 }
 
+function toggleFavorite(coinId){
+  if(state.favorites.includes(coinId)){
+    state.favorites = state.favorites.filter((id)=>{
+        return id !== coinId;
+    });
+  }else{
+    state.favorites.push(coinId);
+  }
+  localStorage.setItem('favorites', JSON.stringify(state.favorites));
+  renderCoins(state.filteredCoins);
+  addFavoriteEvents();
+}
+
+function loadFavorites(){
+  const data = localStorage.getItem('favorites');
+  state.favorites = data ? JSON.parse(data) : [];
+}
+
+function addFavoriteEvents() {
+  const buttons = document.querySelectorAll('.fav-btn');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const coinId = btn.dataset.id;
+      toggleFavorite(coinId);
+    });
+  });
+}
+
 async function init() {
   try {
+    loadFavorites();
+
     state.isLoading = true; 
 
     const data = await fetchCoins();
@@ -39,6 +71,8 @@ async function init() {
     state.filteredCoins = data;
 
     renderCoins(state.filteredCoins);
+    addFavoriteEvents();
+    
 
     state.isLoading = false;
   }catch(error){
@@ -46,6 +80,8 @@ async function init() {
     console.error(error);
   }
 }
+
+
 
 searchInput.addEventListener("input", debouncedSearch);
 
