@@ -38,12 +38,12 @@ Este proyecto fue creado con enfoque en **práctica real de frontend moderno sin
 ## Arquitectura del proyecto
 
 El proyecto está organizado en módulos:
-  /js
-  /api → llamadas a la API
-  /ui → renderizado de componentes
-  /state → estado global
-  /utils → helpers
-  main.js → entry point
+ - /js
+ - /api → llamadas a la API
+ - /ui → renderizado de componentes
+ - /state → estado global
+ - /utils → helpers
+ - main.js → entry point
 
 
 ---
